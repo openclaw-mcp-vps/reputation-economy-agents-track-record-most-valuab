@@ -11,24 +11,25 @@ NICHE: ai-agents
 PRICE: $$15/mo
 
 ARCHITECTURE SPEC:
-A Next.js application with a dashboard for tracking AI agent performance metrics, integrated scoring algorithms, and historical analytics. Uses PostgreSQL for storing agent execution data and performance scores, with real-time monitoring capabilities.
+A Next.js SaaS platform with a dashboard for tracking AI agent performance metrics, a scoring algorithm that evaluates agents across multiple dimensions, and integration APIs for collecting agent execution data. The system uses PostgreSQL to store historical performance data and provides real-time analytics with customizable scoring weights.
 
 PLANNED FILES:
 - app/page.tsx
 - app/dashboard/page.tsx
 - app/agents/page.tsx
+- app/agents/[id]/page.tsx
 - app/api/agents/route.ts
-- app/api/metrics/route.ts
+- app/api/agents/[id]/metrics/route.ts
 - app/api/webhooks/lemonsqueezy/route.ts
-- components/agent-card.tsx
+- components/agent-score-card.tsx
 - components/performance-chart.tsx
-- components/reputation-score.tsx
-- lib/scoring-engine.ts
+- components/agent-list.tsx
+- lib/scoring-algorithm.ts
 - lib/database.ts
 - lib/lemonsqueezy.ts
 - prisma/schema.prisma
 
-DEPENDENCIES: next, react, tailwindcss, prisma, @prisma/client, recharts, @lemonsqueezy/lemonsqueezy.js, lucide-react, clsx, zod, next-auth
+DEPENDENCIES: next, tailwindcss, @prisma/client, prisma, recharts, @lemonsqueezy/lemonsqueezy.js, next-auth, @next-auth/prisma-adapter, zod, lucide-react, @radix-ui/react-dialog, @radix-ui/react-select
 
 REQUIREMENTS:
 - Next.js 15 with App Router (app/ directory)
@@ -36,7 +37,7 @@ REQUIREMENTS:
 - Tailwind CSS v4
 - shadcn/ui components (npx shadcn@latest init, then add needed components)
 - Dark theme ONLY — background #0d1117, no light mode
-- Lemon Squeezy checkout overlay for payments
+- Stripe Payment Link for payments (hosted checkout — use the URL directly as the Buy button href)
 - Landing page that converts: hero, problem, solution, pricing, FAQ
 - The actual tool/feature behind a paywall (cookie-based access after purchase)
 - Mobile responsive
@@ -56,9 +57,13 @@ REQUIREMENTS:
   to package.json dependencies and re-run npm install + npm run build until it passes.
 
 ENVIRONMENT VARIABLES (create .env.example):
-- NEXT_PUBLIC_LEMON_SQUEEZY_STORE_ID
-- NEXT_PUBLIC_LEMON_SQUEEZY_PRODUCT_ID
-- LEMON_SQUEEZY_WEBHOOK_SECRET
+- NEXT_PUBLIC_STRIPE_PAYMENT_LINK  (full URL, e.g. https://buy.stripe.com/test_XXX)
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY  (pk_test_... or pk_live_...)
+- STRIPE_WEBHOOK_SECRET  (set when webhook is wired)
+
+BUY BUTTON RULE: the Buy button's href MUST be `process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK`
+used as-is — do NOT construct URLs from a product ID, do NOT prepend any base URL,
+do NOT wrap it in an embed iframe. The link opens Stripe's hosted checkout directly.
 
 After creating all files:
 1. Run: npm install
@@ -68,23 +73,3 @@ After creating all files:
 
 Do NOT use placeholder text. Write real, helpful content for the landing page
 and the tool itself. The tool should actually work and provide value.
-
-
-PREVIOUS ATTEMPT FAILED WITH:
-Codex exited -9: Reading additional input from stdin...
-OpenAI Codex v0.121.0 (research preview)
---------
-workdir: /tmp/openclaw-builds/reputation-economy-agents-track-record-most-valuab
-model: gpt-5.3-codex
-provider: openai
-approval: never
-sandbox: danger-full-access
-reasoning effort: xhigh
-reasoning summaries: none
-session id: 019da792-3b69-7f82-9b69-aa49ba7c3605
---------
-user
-# Build Task: reputation-economy-agents-track-record-most-valuab
-
-Build a complete, production-ready Next.js 15 App Router application.
-Please fix the above errors and regenerate.
